@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Based on: dmsearch by Derek Taylor (https://gitlab.com/dwt1/dmscripts/-/blob/master/scripts/dmsearch)
+# Dependencies: dmenu and firefox
+
+# Set with the flags "-e", "-u","-o pipefail" cause the script to fail
+# if certain things happen, which is a good thing.  Otherwise, we can
+# get hidden bugs that are hard to discover.
+set -euo pipefail
+
+# Search Options
+declare -A search_options
+search_options[duckduckgo]="https://duckduckgo.de/?q="
+search_options[google]="https://www.google.de/search?q="
+search_options[wikipedia]="https://de.wikipedia.org/wiki/"
+search_options[reddit]="https://www.reddit.com/search/?q="
+search_options[youtube]="https://www.youtube.com/results?search_query="
+search_options[amazon]="https://www.amazon.de/s?k="
+search_options[archwiki]="https://wiki.archlinux.org/index.php?search="
+search_options[github]="https://github.com/search?q="
+search_options[stackoverflow]="https://stackoverflow.com/search?q="
+
+engine=$(printf '%s\n' "${!search_options[@]}" | sort | dmenu -i -l 20 -p 'Choose search engine:') "$@" || exit
+
+# Getting the url of the search engine we chose.
+url="${search_options["${engine}"]}"
+
+# Searching the chosen engine.
+query=$(echo "$engine" | dmenu -p 'Enter search query:')
+
+# Display search results in web browser
+firefox "${url}${query}"
+
